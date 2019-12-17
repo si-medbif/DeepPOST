@@ -47,7 +47,7 @@ def build_model_json(model_json,weight,fine_tuning = False):
 
 def build_model(model_name, label_length = 2, pooling = "avg", IMAGE_SIZE = None, weight = None, fine_tuning = False):
   '''
-  Build a model from keras.applications with
+  Build a model from keras.applications or efficientnet.tfkeras with
   1. A new output layer with label + 1 nodes for an additional "background" node
   2. Allow weight loading from saved checkpoint (default = imagenet weights" or "Random" for random initial weights)
   3. Allow fine tuning (i.e. keep all layers except the output layer untrained)
