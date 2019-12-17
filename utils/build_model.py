@@ -49,10 +49,13 @@ def build_model(model_name, label_length = 2, pooling = "avg", IMAGE_SIZE = None
   '''
   Build a model from keras.applications with
   1. A new output layer with label + 1 nodes for an additional "background" node
-  2. Allow weight loading from saved checkpoint (default = imagenet weights")
+  2. Allow weight loading from saved checkpoint (default = imagenet weights" or "Random" for random initial weights)
   3. Allow fine tuning (i.e. keep all layers except the output layer untrained)
   '''
-  base_model = select_model(model_name)
+  if "Efficient" in model_name:
+    base_model = select_efn_model(model_name)
+  else:
+    base_model = select_model(model_name)
 
   if weight == None:
     init_weight = "imagenet"
@@ -64,6 +67,8 @@ def build_model(model_name, label_length = 2, pooling = "avg", IMAGE_SIZE = None
   else:
     base_model = base_model(include_top=False, pooling=pooling, weights=init_weight,
                              input_shape=(IMAGE_SIZE[0], IMAGE_SIZE[1], 3))
+  if "Efficient" in model_name:
+    
 
   output = Dense(label_length + 1, activation='softmax')(base_model.output)
   model = Model(base_model.input, output)
