@@ -1,7 +1,7 @@
 import os
 import tensorflow as tf
 import tensorflow.keras.applications as keras_model
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.models import Model, load_model, model_from_json
 import efficientnet.tfkeras as efn
 
@@ -68,10 +68,15 @@ def build_model(model_name, label_length = 2, pooling = "avg", IMAGE_SIZE = None
     base_model = base_model(include_top=False, pooling=pooling, weights=init_weight,
                              input_shape=(IMAGE_SIZE[0], IMAGE_SIZE[1], 3))
   if "Efficient" in model_name:
-    
-
-  output = Dense(label_length + 1, activation='softmax')(base_model.output)
-  model = Model(base_model.input, output)
+    x = base_model.output
+    x = Flatten()(x)
+    x = Dense(1024, activation="relu")(x)
+    x = Dropout(0.5)(x)
+    output = Dense(label_length + 1, activation="softmax")(x)
+    model = Model(base_model.input, output)
+  else:
+    output = Dense(label_length + 1, activation='softmax')(base_model.output)
+    model = Model(base_model.input, output)
 
   if weight != None and weight != "Random":
     model.load_weights(weight)
