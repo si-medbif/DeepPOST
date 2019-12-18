@@ -11,7 +11,7 @@ import re
 
 #No augmentation during training
 def _parse_fn(example_serialized, image_size = 299):
-    """Helper function for parse_fn_train() and parse_fn_valid()
+  """Helper function for parse_fn_train() and parse_fn_valid()
     Each Example proto (TFRecord) contains the following fields:
     image/height: 462
     image/width: 581
@@ -31,7 +31,7 @@ def _parse_fn(example_serialized, image_size = 299):
         a JPEG file.
         label: Tensor tf.int32 containing the label.
         text: Tensor tf.string containing the human-readable label.
-    """
+  """
   feature_map = {
         'image/filename': tf.io.FixedLenFeature([], dtype=tf.string,
                                                 default_value=''),
@@ -50,7 +50,7 @@ def _parse_fn(example_serialized, image_size = 299):
   return image, label
 
 def _parse_fn_test(example_serialized, image_size = 299):
-    """Helper function for parse_fn_train() and parse_fn_valid()
+  """Helper function for parse_fn_train() and parse_fn_valid()
     Each Example proto (TFRecord) contains the following fields:
     image/height: 462
     image/width: 581
@@ -70,7 +70,7 @@ def _parse_fn_test(example_serialized, image_size = 299):
         a JPEG file.
         label: Tensor tf.int32 containing the label.
         text: Tensor tf.string containing the human-readable label.
-    """
+  """
   feature_map = {
         'image/filename': tf.io.FixedLenFeature([], dtype=tf.string,
                                                 default_value=''),
@@ -90,7 +90,7 @@ def _parse_fn_test(example_serialized, image_size = 299):
   return image, label, filename
 
 def _parse_fn_predict(example_serialized, image_size = 299):
-    """Helper function for parse_fn_train() and parse_fn_valid()
+  """Helper function for parse_fn_train() and parse_fn_valid()
     Each Example proto (TFRecord) contains the following fields:
     image/height: 462
     image/width: 581
@@ -110,7 +110,7 @@ def _parse_fn_predict(example_serialized, image_size = 299):
         a JPEG file.
         label: Tensor tf.int32 containing the label.
         text: Tensor tf.string containing the human-readable label.
-    """
+  """
   feature_map = {
         'image/filename': tf.io.FixedLenFeature([], dtype=tf.string,
                                                 default_value=''),
@@ -147,7 +147,7 @@ def _parse_fn_predict(example_serialized, image_size = 299):
 
 
 def count_dataset(tfrecords_dir, subset, batch_size, epochs):
-    """Read TFRecords files and turn them into a TFRecordDataset."""
+  """Read TFRecords files and turn them into a TFRecordDataset."""
   files = tf.io.matching_files(os.path.join(tfrecords_dir, '%s-*' % subset))
   shards = tf.data.Dataset.from_tensor_slices(files)
   shards = shards.shuffle(tf.cast(tf.shape(files)[0], tf.int64))
@@ -159,7 +159,7 @@ def count_dataset(tfrecords_dir, subset, batch_size, epochs):
   return count
 
 def get_dataset(tfrecords_dir, subset, batch_size, epochs):
-    """Read TFRecords files and turn them into a TFRecordDataset."""
+  """Read TFRecords files and turn them into a TFRecordDataset."""
   files = tf.io.matching_files(os.path.join(tfrecords_dir, '%s-*' % subset))
   shards = tf.data.Dataset.from_tensor_slices(files)
   shards = shards.shuffle(tf.cast(tf.shape(files)[0], tf.int64))
@@ -175,6 +175,7 @@ def get_dataset(tfrecords_dir, subset, batch_size, epochs):
   return dataset
 
 def get_one_slide(tfrecords_dir, file, batch_size = 1, evaluate = True):
+  """Read TFRecord of one slide at a time"""
   dataset = tf.data.TFRecordDataset([os.path.join(tfrecords_dir,file)])
   if evaluate:
     datasets = dataset.map(_parse_fn_test)
