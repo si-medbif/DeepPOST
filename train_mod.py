@@ -9,9 +9,22 @@ from datetime import datetime
 import tensorflow as tf
 
 #Allow GPU memory growth
-config = tf.compat.v1.ConfigProto()
-config.gpu_options.allow_growth = True
-session = tf.compat.v1.Session(config=config)
+#config = tf.compat.v1.ConfigProto()
+#config.gpu_options.allow_growth = True
+#session = tf.compat.v1.Session(config=config)
+
+#Allow GPU growth
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  try:
+    # Currently, memory growth needs to be the same across GPUs
+    for gpu in gpus:
+      tf.config.experimental.set_memory_growth(gpu, True)
+    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+  except RuntimeError as e:
+    # Memory growth must be set before GPUs have been initialized
+    print(e)
 
 # Assign flags
 FLAGS = flags.FLAGS
@@ -22,6 +35,9 @@ flags.DEFINE_string("model", None, "1) Create a fresh model to call from keras.a
 
 #Flag for transfer learning
 flags.DEFINE_string("chkpt", None, "Path to saved weight checkpoint for transfer learning (Imagenet weights if not specified)")
+
+#Flags for using multiple GPUs
+flags.DEFINE_boolean("multi_gpus", False, "Specify distributed training strategy for multiple GPUs")
 
 #Hyperparameter flags
 flags.DEFINE_float("learning_rate",0.001,"Specify learning rate (default = 0.001)")
@@ -40,9 +56,7 @@ flags.mark_flag_as_required("dataset_dir")
 flags.mark_flag_as_required("out_dir")
 flags.mark_flag_as_required("model")
 
-def main(argv):
-  del argv #Unused
-
+def train(FLAGS):
   if "json" in FLAGS.model:
   #Create a model from saved structure (json file) and weights (ckpt file)
     model = build_model_json(model_json = FLAGS.model,
@@ -93,7 +107,7 @@ def main(argv):
   #Setup early stopping
   earlystop_callback = EarlyStopping(
       monitor='val_accuracy', min_delta=0.0001,
-      patience=5)
+      patience=10)
 
   #Fit the model
   model.fit(
@@ -103,6 +117,17 @@ def main(argv):
         validation_steps=count_valid,
         callbacks=[checkpoint, tensorboard_callback, earlystop_callback],
         epochs=FLAGS.epochs)
+
+def main(argv):
+  del argv #Unused
+  
+  if FLAGS.multi_gpus:
+    tf.debugging.set_log_device_placement(True)
+    strategy = tf.distribute.MirroredStrategy()
+    with strategy.scope():
+      train(FLAGS)
+  else:
+    train(FLAGS)
 
 if __name__ == '__main__':
   app.run(main)
