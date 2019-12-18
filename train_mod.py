@@ -13,6 +13,7 @@ import tensorflow as tf
 #config.gpu_options.allow_growth = True
 #session = tf.compat.v1.Session(config=config)
 
+tf.debugging.set_log_device_placement(True)
 #Allow GPU growth
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
@@ -122,7 +123,7 @@ def main(argv):
   del argv #Unused
   
   if FLAGS.multi_gpus:
-    tf.debugging.set_log_device_placement(True)
+    #tf.debugging.set_log_device_placement(True)
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
       train(FLAGS)
