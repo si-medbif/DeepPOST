@@ -1,8 +1,32 @@
 import os
-import argparse
 from joblib import Parallel, delayed
 import re
 import random
+from absl import flags
+from absl import app
+
+
+# Assign flags
+FLAGS = flags.FLAGS
+flags.DEFINE_string("source_dir", None, "Path to slide tile files")
+flags.DEFINE_string("out_dir", None, "Path for saving renamed and augmented tile files")
+flags.DEFINE_string("sort_file", None, "Path to sort file / sample sheet file")
+'''
+    Sample sheet file must have these columns:
+    column 1 = Slide name from which tile files were derived.
+    column 2 = Label (e.g. CA versus Benign)
+    column 3 = Group (e.g test_, train_ and valid_)
+    column 4 = Number of rotation (for data augmentation, 1 for no augmentation)
+    The file must be in a tab-delimited format.
+'''
+flags.DEFINE_integer("jobs",-1,"Number of parallel jobs (default = -1 for using all available threads)")
+
+
+# Required flags
+flags.mark_flag_as_required("source_dir")
+flags.mark_flag_as_required("out_dir")
+flags.mark_flag_as_required("sort_file")
+
 
 #Read GDC sample sheet (With header)
 def readGDC(filename, inpath, outpath, job, header = True):
@@ -50,50 +74,10 @@ def rotate_list(fname,inpath,outpath,label,group,nrotate):
                 lst.append(cmd)
     return(lst)
             
-def main(args):
-    readGDC(args.file_name, args.input_path, args.output_path, header = False, args.job)
+def main(argv):
+    del argv #Unused
+    readGDC(FLAGS.sort_file, FLAGS.source_dir, FLAGS.out_dir,  job = FLAGS.jobs, header = False)
 
-  
+
 if __name__ == '__main__':
-    
-    parser = argparse.ArgumentParser()
-    
-    parser.add_argument(
-        "-f",
-        "--file_name",
-        action="store",
-        help="Name and path of the sample sheet file"
-        
-    )
-    '''
-    Sample sheet file must have these columns:
-    column 1 = Slide name from which tile files were derived.
-    column 2 = Label (e.g. CA versus Benign)
-    column 3 = Group (e.g test_, train_ and valid_)
-    column 4 = Number of rotation (for data augmentation)
-    The file must be in a tab-delimited format.
-    '''
-    parser.add_argument(
-        "-i",
-        "--input_path",
-        action="store",
-        help="Name and path of the tile files"
-    )
-    
-    parser.add_argument(
-        "-o",
-        "--output_path",
-        action="store",
-        help="Name and path of the destinateion for sorted tile files. The destination must have subdirectories of labels (e.g Dest/Label1/ Dest/Label2/"
-    )
-    
-    parser.add_argument(
-        "-j",
-        "--job",
-        action="store",
-        default=4,
-        help="Number of parallel jobs to be submitted (Defualt = 4 jobs)"
-    )
-    
-    args = parser.parse_args()
-    main(args)
+    app.run(main)
