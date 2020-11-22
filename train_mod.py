@@ -31,7 +31,7 @@ if gpus:
 FLAGS = flags.FLAGS
 #Required flags
 flags.DEFINE_string("dataset_dir", None, "Path to Train/Valid TFRecords")
-flags.DEFINE_string("out_dir", None, "Path for saving TFRecord files")
+flags.DEFINE_string("out_dir", None, "Path for saving weight checkpoint")
 flags.DEFINE_string("model", None, "1) Create a fresh model to call from keras.applications (e.g. InceptionResNetV2, InceptionV3) or 2) Path to model.json for transferred learning (Must specify saved weight)")
 
 #Flag for transfer learning
