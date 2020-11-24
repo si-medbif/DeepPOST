@@ -146,7 +146,7 @@ def _parse_fn_predict(example_serialized, image_size = 299):
 #     return dataset
 
 
-def count_dataset(tfrecords_dir, subset, batch_size, epochs):
+def count_dataset(tfrecords_dir, subset, batch_size): #, epochs):
   """Read TFRecords files and turn them into a TFRecordDataset."""
   files = tf.io.matching_files(os.path.join(tfrecords_dir, '%s-*' % subset))
   #shards = tf.data.Dataset.from_tensor_slices(files)
