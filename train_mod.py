@@ -83,8 +83,8 @@ def train(FLAGS):
               metrics=['accuracy'])
 
   #Prepare datasets from TFRecord shards
-  count_train = count_dataset(FLAGS.dataset_dir, 'train', FLAGS.batch_size,FLAGS.epochs)
-  count_valid = count_dataset(FLAGS.dataset_dir, 'valid', FLAGS.batch_size,FLAGS.epochs)
+  count_train = count_dataset(FLAGS.dataset_dir, 'train', FLAGS.batch_size)#,FLAGS.epochs)
+  count_valid = count_dataset(FLAGS.dataset_dir, 'valid', FLAGS.batch_size)#,FLAGS.epochs)
 
   ds_train = get_dataset(FLAGS.dataset_dir, 'train', FLAGS.batch_size,FLAGS.epochs)
   ds_valid = get_dataset(FLAGS.dataset_dir, 'valid', FLAGS.batch_size,FLAGS.epochs)
