@@ -149,13 +149,17 @@ def _parse_fn_predict(example_serialized, image_size = 299):
 def count_dataset(tfrecords_dir, subset, batch_size, epochs):
   """Read TFRecords files and turn them into a TFRecordDataset."""
   files = tf.io.matching_files(os.path.join(tfrecords_dir, '%s-*' % subset))
+  #shards = tf.data.Dataset.from_tensor_slices(files)
+  #shards = shards.shuffle(tf.cast(tf.shape(files)[0], tf.int64))
+  #dataset = shards.interleave(tf.data.TFRecordDataset, num_parallel_calls=tf.data.experimental.AUTOTUNE)
   shards = tf.data.Dataset.from_tensor_slices(files)
-  shards = shards.shuffle(tf.cast(tf.shape(files)[0], tf.int64))
-  dataset = shards.interleave(tf.data.TFRecordDataset, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
-    #The code below will be removed if not needed
+  dataset = tf.data.TFRecordDataset(shards, num_parallel_reads=tf.data.experimental.AUTOTUNE)
   tmpdataset = dataset.batch(batch_size, drop_remainder = False)
   count = tmpdataset.reduce(0, lambda x, _: x + 1).numpy()
+
+  #The code below will be removed if not needed
+  #tmpdataset = dataset.batch(batch_size, drop_remainder = False)
+  #count = tmpdataset.reduce(0, lambda x, _: x + 1).numpy()
   return count
 
 def get_dataset(tfrecords_dir, subset, batch_size, epochs):
